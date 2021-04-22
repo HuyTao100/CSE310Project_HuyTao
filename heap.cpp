@@ -4,11 +4,10 @@
 #include "heap.h"
 #include "graph.h"
 
-HEAP* Initialize(HEAP* heap, int n, int s) {
+HEAP* Initialize(HEAP* heap, int n, int s) 
+{
     if (heap != NULL)
     {
-        heap->capacity = n;
-        heap->size = 1;
         heap = initializeSingleSource(heap, s);
     }
     return heap;
@@ -83,7 +82,7 @@ int minHeapify(HEAP* heap, int i) {
     l = i * 2;
     r = (i * 2) + 1;
     int calls = 1;
-    if (l <= heap->size && heap->H[l]->key < heap->H[i]->key)
+    if (l <= heap->size && heap->H[l]->distance < heap->H[i]->distance)
     {
         smallest = l;
     }
@@ -91,15 +90,15 @@ int minHeapify(HEAP* heap, int i) {
     {
         smallest = i;
     }
-    if (r <= heap->size && heap->H[r]->key < heap->H[smallest]->key)
+    if (r <= heap->size && heap->H[r]->distance < heap->H[smallest]->distance)
     {
         smallest = r;
     }
     if (smallest != i)
     {
-        int temp = heap->H[i]->key;
-        heap->H[i]->key = heap->H[smallest]->key;
-        heap->H[smallest]->key = temp;
+        int temp = heap->H[i]->distance;
+        heap->H[i]->distance = heap->H[smallest]->distance;
+        heap->H[smallest]->distance = temp;
         calls += minHeapify(heap, smallest);
     }
     return calls;

@@ -152,7 +152,7 @@ HEAP* relax(HEAP* Q, int u, int v, float value, int flag)
 	 }
  }
 
-HEAP* DijkstraSP(int n, int s, int value, int flag)
+HEAP* DijkstraSP(int n, int s, float value, int flag)
 {
 	HEAP* priorityQueue;
 	VERTEX* u;
@@ -160,7 +160,38 @@ HEAP* DijkstraSP(int n, int s, int value, int flag)
 	while (priorityQueue != NULL)
 	{
 		u = extractMin(priorityQueue, flag);
-		numInQueue--;
+		numInQueue = numInQueue--;
+		for (int i = 0; i < vertices; i++)
+		{
+			EDGE** someArray = arrays[i];
+			for (int j = 0; j < vertices; j++)
+			{
+				if (someArray[j]->vertex_u == u->vertex_ID)
+				{
+					relax(priorityQueue, u->vertex_ID, someArray[j]->vertex_v, value, flag);
+				}
 
+				if (someArray[j]->vertex_v == u->vertex_ID)
+				{
+					relax(priorityQueue, someArray[j]->vertex_v, u->vertex_ID, value, flag);
+				}
+			}
+		}
+		
+	}
+	return priorityQueue;
+}
+
+VERTEX* getVertex(int i)
+{
+	return vertexArray[i];
+}
+
+VERTEX* findVertex(int i)
+{
+	EDGE** someArray = arrays[i];
+	if (someArray[i]->vertex_u == i)
+	{
+		return vertexArray[someArray[i]->vertex_u];
 	}
 }

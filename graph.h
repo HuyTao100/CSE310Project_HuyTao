@@ -19,6 +19,8 @@ void graph(int argc, char* argv[]);
 HEAP* initializeSingleSource(HEAP* Q, int vertex);
 int getWeight(int u, int v);
 HEAP* relax(HEAP* Q, int u, int v, float value, int flag);
-HEAP* DijkstraSP(int s, int value);
+HEAP* DijkstraSP(int n, int s, float value, int flag);
+VERTEX* findVertex(int i);
+VERTEX* getVertex(int i);
 
 #endif
