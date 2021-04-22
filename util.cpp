@@ -1,45 +1,40 @@
 #include <stdio.h>
 #include "util.h"
+#include "heap.h"
+#include <iostream>
 #pragma warning(disable:4996)
 
-int nextCommand(int* n, int* f)
+int nextCommand(int* n, int* f, int *o)
 {
-    char c;
+    char c[1000];
+    int command;
     while (1) {
-        scanf("%c", &c);
-        if (c == ' ' || c == '\t' || c == '\n') {
-            continue;
-        }
-        if (c == 'S' || c == 's') {
+        scanf("%s", c);
+        if (strcmp(c, "find") == 0)
+        {
+            scanf("%d %d %d", n, f, o);
+            command = 1;
             break;
         }
-        if (c == 'C' || c == 'c') {
-            scanf("%d", n);
+        if (strcmp(c, "write") == 0)
+        {
+            scanf("%s", c);
+            if (strcmp(c, "path") == 0)
+            {
+                scanf("%d %d %d", n, f, o);
+                command = 2;
+                break;
+            }
+        }
+
+        if (strcmp(c, "stop") == 0)
+        {
+            command = 3;
             break;
         }
-        if (c == 'R' || c == 'r') {
-            scanf("%d", f);
-            break;
-        }
-        if (c == 'P' || c == 'p') {
-            break;
-        }
-        if (c == 'W' || c == 'w') {
-            break;
-        }
-        if (c == 'I' || c == 'i') {
-            scanf("%d", n);
-            break;
-        }
-        if (c == 'D' || c == 'd') {
-            scanf("%d", f);
-            break;
-        }
-        if (c == 'K' || c == 'k') {
-            scanf("%d", n);
-            scanf("%d", f);
-            break;
-        }
+
+        printf("Warning in nextCommand invalid input \n");
+        break;
     }
-    return c;
+    return command;
 }

@@ -10,12 +10,13 @@ typedef struct TAG_EDGE {
 }EDGE;
 
 typedef struct TAG_VERTEX {
+	int vertex_ID;
 	int distance;
 	VERTEX* previous;
 }VERTEX;
 
 void graph(int argc, char* argv[]);
-VERTEX** initializeSingleSource(EDGE*** someArrays, int vertex);
+VERTEX** initializeSingleSource(int vertex);
 int getWeight(int u, int v);
 VERTEX** relax(int u, int v);
 

@@ -1,106 +1,108 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include <iostream>
+#include <stdlib.h>
+#include <stdio.h>
+#include <cstring>
 #include "util.h"
 #include "heap.h"
-#pragma warning(disable:4996)
+#include "graph.h"
+using namespace std;
 
-int main()
+int main(int argc, char *argv[])
 {
-    HEAP* heap;
-    heap = NULL;
-    char c;
-    FILE* ifile;
-    ElementT element;
-    int i, v, n, f;
-    while (1) {
-        c = nextCommand(&n, &f);
-        switch (c) {
-        case 's':
-        case 'S': exit(0);
+	graph(argc, argv);
+	FILE *ifile;
+	int n, m;
 
-        case 'c':
-        case 'C':
-            heap = Initialize(n);
-            break;
+	fscanf(ifile, "%d %d", &n, &m);
+	int command, arg1, arg2, arg3, source;
+	bool isComputed = false;
+	HEAP *Q = NULL;
+	HEAP* S = NULL;
+	while (1)
+	{
+		command = nextCommand(&arg1, &arg2, &arg3);
+		switch (command)
+		{
+		case 1: //find <source> <destination> <flag>
+		{
+			cout << "Query: find " << arg1 << " " << arg2 << " " << arg3 << "\n";
+			if ((arg1 < 1 || arg1 > n) || arg2 == arg1 || (arg3 != 1 && arg3 != 0))
+			{
+				cout << "Error: invalid find query\n";
+				break;
+			}
+			source = arg1;
+			Q = Initialize(n, arg1);
+			while (Q != NULL)
+			{
 
-        case 'r':
-        case 'R':
-            int aNum;
-            ifile = fopen("HEAPinput.txt", "r");
-            if (!ifile) {
-                printf("Error: cannot open file for reading\n");
-                break;
-            }
-            fscanf(ifile, "%d", &n);
-            if (heap == NULL || heap->capacity < n) {
-                printf("Error: heap overflow\n");
-                break;
-            }
-            heap->size = 0;
-            for (int i = 1; i <= n; i++) {
-                fscanf(ifile, "%d", &aNum);
-                element = (ElementT)malloc(sizeof(ELEMENT)); //Dynamic memory Allocation
-                element->key = aNum;
-                heap->H[i] = element;
-                heap->size++;
-            }
-            v = buildMinHeap(heap);
-            if (f == 1)
-            {
-                printf("Number of Heapify calls: %d\n", v);
-            }
-            break;
+			}
+			isComputed = true;
+			break;
+		}
+		case 2: //write path <s> <d>
+		{
+			cout << "Query: write path " << arg1 << " " << arg2 << "\n";
+			if (isComputed == false)
+			{
+				cout << "Error: no path computation done\n";
+				break;
+			}
+			if (arg1 != source || (arg2 < 1 || arg2 > n))
+			{
+				cout << "Error: invalid source destination pair\n";
+				break;
+			}
 
-        case 'p':
-        case 'P':
-            if (heap == NULL) {
-                printf("Error: cannot print\n");
-                break;
-            }
-            else {
-                printHeap(heap);
-                break;
-            }
+			Vertex v = findVertex(graph, arg2);
+			int *paths = (int *)malloc(n * sizeof(int)); //dynamic memory allocation
+			int count = 0;
+			while (v != NULL && v->V->id != arg1)
+			{
+				paths[count] = v->V->id;
+				count++;
+				v = findVertex(graph, v->parent->id);
+			}
 
-        case 'w':
-        case 'W':
-            if (heap == NULL) {
-                printf("Error: cannot write\n");
-                break;
-            }
-            writeHeap(heap);
-            break;
+			Vertex d = findVertex(graph, arg2);
+			float weight = d->distance;
 
-        case 'i':
-        case 'I':
-            if (heap == NULL || heap->size == heap->capacity) {
-                printf("Error: heap is NULL or full\n");
-                break;
-            }
-            element = (ElementT)malloc(sizeof(ELEMENT)); //Dynamic Memory Allocations
-            element->key = n;
-            insert(heap, element);
-            break;
+			if (weight == INT8_MAX && Q->size != 0)
+			{
+				printf("No %d-%d path has been computed.\n", arg1, arg2);
+				break;
+			}
+			else if (v == NULL)
+			{
+				printf("No %d-%d path exists.\n", arg1, arg2);
+				break;
+			}
+			paths[count] = v->V->id;
+			count++;
 
-        case 'd':
-        case 'D':
-            if (heap == NULL || heap->size == 0)
-            {
-                printf("Error: heap is NULL or empty\n");
-                break;
-            }
-            v = extractMin(heap);
-            if (f == 1)
-            {
-                printf("Number of Heapify calls: %d\n", v);
-            }
-            break;
-
-        case 'K':
-            decreaseKey(heap, n, f);
-            break;
-        default: break;
-        }
-    }exit(0);
+			if (getVertexIndex(Q, arg2) != 0)
+				cout << "Path not known to be shortest: <";
+			else
+				cout << "Shortest path: <";
+			for (int i = count - 1; i > 0; i--)
+			{
+				cout << paths[i] << ", ";
+			}
+			cout << paths[0] << ">\n";
+			printf("The path weight is: %12.4f\n", weight);
+			break;
+		}
+		case 3: //stop
+		{
+			cout << "Query: stop\n";
+			//free all dynamically allocated memory
+			free(graph);
+			free(Q);
+			exit(0);
+		}
+		default:
+			break;
+		}
+	}
+	exit(0);
 }

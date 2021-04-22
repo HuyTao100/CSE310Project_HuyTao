@@ -2,85 +2,41 @@
 #include <stdlib.h>
 #include <limits.h>
 #include "heap.h"
+#include "graph.h"
 
-HEAP* Initialize(int n) {
+HEAP* Initialize(int n, int s) {
     HEAP* heap = (HEAP*)calloc(1, sizeof(HEAP)); // Dynamic memory allocation
     if (heap != NULL)
     {
         heap->capacity = n;
         heap->size = 1;
-        heap->H = (ElementT*)calloc(n + 1, sizeof(ElementT)); // Dynamic memory allocation
+        heap->H = initializeSingleSource(s);
     }
     return heap;
 }
 
-void printHeap(HEAP* heap) {
-    printf("capacity=%d, size=%d\n", heap->capacity, heap->size);
-    if (heap->size > 0)
-    {
-        for (int i = 1; i <= heap->size - 1; i++)
-        {
-            printf("%d, ", heap->H[i]->key);
-        }
-        printf("%d\n", heap->H[heap->size]->key);
-    }
-}
-
-void writeHeap(HEAP* heap)
+int extractMin(HEAP* heap, int flag)
 {
-    FILE* afile;
-    afile = fopen("HEAPoutput.txt", "w");
-    if (!afile) {
-        printf("Error: cannot write\n");
-        return;
-    }
-    else {
-        fprintf(afile, "%d\n", heap->size);
-        for (int i = 1; i <= heap->size; i++) {
-            fprintf(afile, "%d\n", heap->H[i]->key);
-        }
-    }
-    fclose(afile);
-}
-
-void insert(HEAP* heap, ELEMENT* element)
-{
-    if (heap == NULL || heap->size == heap->capacity)
+    VERTEX* minimum;
+    if (heap == NULL || heap->size < 1)
     {
-        printf("Error: heap is NULL or full\n");
-    }
-    heap->size++;
-    int i = heap->size;
-    while (i > 1 && heap->H[i / 2]->key > element->key)
-    {
-        heap->H[i] = heap->H[i / 2];
-        i = i / 2;
-    }
-    heap->H[i] = element;
-}
-
-int extractMin(HEAP* heap)
-{
-    int minimum;
-    int calls;
-    if (heap->size < 1)
-    {
-        printf("Error: heap is EMPTY\n");
+        printf("Error: heap is NULL or empty\n");
     }
     else
     {
-        minimum = heap->H[1]->key;
+        minimum = heap->H[1];
         heap->H[1] = heap->H[heap->size];
         heap->size--;
-        calls = minHeapify(heap, 1);
-        printf("Deleted key: %d\n", minimum);
+        minHeapify(heap, 1);
     }
-    return calls;
+    if (flag == 1)
+        printf("Delete vertex %d, key=%12.4f\n", minimum->vertex_ID, minimum->distance);
+    return minimum->vertex_ID;
 }
 
-void decreaseKey(HEAP* heap, int i, int key)
+void decreaseKey(HEAP* heap, int id, float value, int flag)
 {
-    if (heap == NULL || i < 1 || i > heap->size || key >= heap->H[i]->key)
+    if (heap == NULL || id < 1 || id > heap->size || value >= heap->H[id]->distance)
     {
         printf("Error: invalid call to DecreaseKey\n");
     }
@@ -96,6 +52,21 @@ void decreaseKey(HEAP* heap, int i, int key)
         }
     }
 
+}
+
+int getVertexIndex(HEAP* heap, int id)
+{
+    if (heap != NULL)
+    {
+        for (int i = 1; i < heap->size + 1; i++)
+        {
+            if (heap->H[i]->vertex_ID == id)
+            {
+                return i;
+            }
+        }
+    }
+    return 0;
 }
 
 int minHeapify(HEAP* heap, int i) {

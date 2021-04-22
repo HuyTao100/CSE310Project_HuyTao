@@ -94,18 +94,19 @@ int numInQueue = 0;
 
 }
 
- VERTEX** initializeSingleSource(EDGE*** someArrays, int vertex)
+ VERTEX** initializeSingleSource(int vertex)
  {
 	 for (int i = 0; i < vertices; i++)
 	 {
 		 VERTEX* someVertex = new VERTEX();
+		 someVertex->vertex_ID = i;
 		 someVertex->distance = INFINITY;
 		 someVertex->previous = NULL;
 		 vertexArray[i] = someVertex;
 		 vertexArray[vertex]->distance = 0;
-		 priorityQueue[numInQueue] = vertexArray[vertex];
-		 numInQueue = numInQueue + 1;
 	 }
+	 priorityQueue[numInQueue] = vertexArray[vertex];
+	 numInQueue = numInQueue + 1;
 
 	 return priorityQueue;
  }
@@ -138,11 +139,12 @@ int numInQueue = 0;
 		 vertexArray[v]->previous = vertexArray[u];
 		 priorityQueue[numInQueue] = vertexArray[v];
 		 numInQueue = numInQueue + 1;
+		 return priorityQueue;
 	 }
 	 else if (vertexArray[v]->distance > vertexArray[u]->distance + getWeight(u, v))
 	 {
 		 vertexArray[v]->distance = vertexArray[u]->distance + getWeight(u, v);
 		 vertexArray[v]->previous = vertexArray[u];
-
+		 return priorityQueue;
 	 }
  }
