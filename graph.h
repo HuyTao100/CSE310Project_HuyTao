@@ -1,5 +1,6 @@
 #ifndef graph_H_
 #define graph_H_
+#include "heap.h"
 
 typedef struct TAG_EDGE {
 	int edge_ID;

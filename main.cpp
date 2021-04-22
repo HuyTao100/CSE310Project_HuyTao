@@ -17,7 +17,6 @@ int main(int argc, char *argv[])
 	int command, arg1, arg2, arg3, source;
 	bool isComputed = false;
 	HEAP *Q = NULL;
-	HEAP* S = NULL;
 	while (1)
 	{
 		command = nextCommand(&arg1, &arg2, &arg3);
@@ -92,7 +91,6 @@ int main(int argc, char *argv[])
 		{
 			cout << "Query: stop\n";
 			//free all dynamically allocated memory
-			free(graph);
 			free(Q);
 			exit(0);
 		}
