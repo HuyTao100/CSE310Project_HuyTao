@@ -16,8 +16,8 @@ typedef struct TAG_VERTEX {
 }VERTEX;
 
 void graph(int argc, char* argv[]);
-VERTEX** initializeSingleSource(int vertex);
+HEAP* initializeSingleSource(int vertex);
 int getWeight(int u, int v);
-VERTEX** relax(int u, int v);
+HEAP* relax(int u, int v);
 
 #endif

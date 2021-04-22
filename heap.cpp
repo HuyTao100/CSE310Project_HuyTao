@@ -36,19 +36,29 @@ int extractMin(HEAP* heap, int flag)
 
 void decreaseKey(HEAP* heap, int id, float value, int flag)
 {
-    if (heap == NULL || id < 1 || id > heap->size || value >= heap->H[id]->distance)
+    if (heap == NULL)
     {
         printf("Error: invalid call to DecreaseKey\n");
     }
     else
     {
-        heap->H[i]->key = key;
-        while (i > 1 && heap->H[i / 2]->key > heap->H[i]->key)
+        int indexOfHeap = getVertexIndex(heap, id);
+        if (indexOfHeap < 1 || indexOfHeap > heap->size || value >= heap->H[indexOfHeap]->distance)
         {
-            int temp = heap->H[i]->key;
-            heap->H[i]->key = heap->H[i / 2]->key;
-            heap->H[i / 2]->key = temp;
-            i = i / 2;
+            printf("Error: invalid call to DecreaseKey\n");
+        }
+        else
+        {
+            if (flag == 1)
+                printf("Decrease key of vertex %d, from %12.4f to %12.4f\n", id, heap->H[indexOfHeap]->distance, value);
+        }
+        heap->H[indexOfHeap]->distance = value;
+        while (indexOfHeap > 1 && heap->H[indexOfHeap / 2]->distance < heap->H[indexOfHeap]->distance)
+        {
+            int temp = heap->H[indexOfHeap]->distance;
+            heap->H[indexOfHeap]->distance = heap->H[indexOfHeap / 2]->distance;
+            heap->H[indexOfHeap / 2]->distance = temp;
+            indexOfHeap = indexOfHeap / 2;
         }
     }
 
@@ -106,3 +116,4 @@ int buildMinHeap(HEAP* heap)
     }
     return calls;
 }
+

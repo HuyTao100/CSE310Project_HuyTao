@@ -11,8 +11,9 @@ typedef struct TAG_HEAP {
 
 HEAP* Initialize(int n, int s);
 int extractMin(HEAP* heap, int flag);
-void decreaseKey(HEAP* heap, int i, int key);
+void decreaseKey(HEAP* heap, int i, float value, int key);
 int minHeapify(HEAP* heap, int i);
 int buildMinHeap(HEAP* heap);
+int getVertexIndex(HEAP* heap, int id);
 
 #endif

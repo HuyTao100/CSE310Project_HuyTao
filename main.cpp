@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 {
 	graph(argc, argv);
 	FILE *ifile;
-	int n, m;
+	int n, m, u;
 
 	fscanf(ifile, "%d %d", &n, &m);
 	int command, arg1, arg2, arg3, source;
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 			Q = Initialize(n, arg1);
 			while (Q != NULL)
 			{
-
+				u = extractMin(Q, arg3);
 			}
 			isComputed = true;
 			break;

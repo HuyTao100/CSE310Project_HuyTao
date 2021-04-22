@@ -5,13 +5,14 @@
 #include <algorithm>
 #include <regex>
 #include "graph.h"
+#include "heap.h"
 
 using namespace std;
 
 int vertices, edges;
 EDGE*** arrays;
 VERTEX** vertexArray;
-VERTEX** priorityQueue;
+HEAP* priorityQueue;
 int numInQueue = 0;
 
  void graph(int argc, char* argv[])
@@ -94,7 +95,7 @@ int numInQueue = 0;
 
 }
 
- VERTEX** initializeSingleSource(int vertex)
+HEAP* initializeSingleSource(int vertex)
  {
 	 for (int i = 0; i < vertices; i++)
 	 {
@@ -105,7 +106,7 @@ int numInQueue = 0;
 		 vertexArray[i] = someVertex;
 		 vertexArray[vertex]->distance = 0;
 	 }
-	 priorityQueue[numInQueue] = vertexArray[vertex];
+	 priorityQueue->H[numInQueue] = vertexArray[vertex];
 	 numInQueue = numInQueue + 1;
 
 	 return priorityQueue;
@@ -131,13 +132,13 @@ int numInQueue = 0;
 	 }
  }
 
- VERTEX** relax(int u, int v)
+HEAP* relax(int u, int v, float value, int flag)
  {
 	 if (vertexArray[v]->distance == INFINITY)
 	 {
 		 vertexArray[v]->distance = vertexArray[u]->distance + getWeight(u, v);
 		 vertexArray[v]->previous = vertexArray[u];
-		 priorityQueue[numInQueue] = vertexArray[v];
+		 priorityQueue->H[numInQueue] = vertexArray[v];
 		 numInQueue = numInQueue + 1;
 		 return priorityQueue;
 	 }
@@ -145,6 +146,7 @@ int numInQueue = 0;
 	 {
 		 vertexArray[v]->distance = vertexArray[u]->distance + getWeight(u, v);
 		 vertexArray[v]->previous = vertexArray[u];
+		 decreaseKey(priorityQueue, v, value, flag);
 		 return priorityQueue;
 	 }
  }
