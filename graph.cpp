@@ -12,7 +12,6 @@ using namespace std;
 int vertices, edges;
 EDGE*** arrays;
 VERTEX** vertexArray;
-HEAP* priorityQueue;
 int numInQueue = 0;
 
  void graph(int argc, char* argv[])
@@ -95,7 +94,7 @@ int numInQueue = 0;
 
 }
 
-HEAP* initializeSingleSource(int vertex)
+HEAP* initializeSingleSource(HEAP* Q, int vertex)
  {
 	 for (int i = 0; i < vertices; i++)
 	 {
@@ -106,10 +105,12 @@ HEAP* initializeSingleSource(int vertex)
 		 vertexArray[i] = someVertex;
 		 vertexArray[vertex]->distance = 0;
 	 }
-	 priorityQueue->H[numInQueue] = vertexArray[vertex];
+	 VERTEX** S = new VERTEX * [vertices];
+	 Q->H = S;
+	 Q->H[numInQueue] = vertexArray[vertex];
 	 numInQueue = numInQueue + 1;
 
-	 return priorityQueue;
+	 return Q;
  }
 
  int getWeight(int u, int v)
@@ -132,21 +133,34 @@ HEAP* initializeSingleSource(int vertex)
 	 }
  }
 
-HEAP* relax(int u, int v, float value, int flag)
+HEAP* relax(HEAP* Q, int u, int v, float value, int flag)
  {
 	 if (vertexArray[v]->distance == INFINITY)
 	 {
 		 vertexArray[v]->distance = vertexArray[u]->distance + getWeight(u, v);
 		 vertexArray[v]->previous = vertexArray[u];
-		 priorityQueue->H[numInQueue] = vertexArray[v];
+		 Q->H[numInQueue] = vertexArray[v];
 		 numInQueue = numInQueue + 1;
-		 return priorityQueue;
+		 return Q;
 	 }
 	 else if (vertexArray[v]->distance > vertexArray[u]->distance + getWeight(u, v))
 	 {
 		 vertexArray[v]->distance = vertexArray[u]->distance + getWeight(u, v);
 		 vertexArray[v]->previous = vertexArray[u];
-		 decreaseKey(priorityQueue, v, value, flag);
-		 return priorityQueue;
+		 decreaseKey(Q, v, value, flag);
+		 return Q;
 	 }
  }
+
+HEAP* DijkstraSP(int n, int s, int value, int flag)
+{
+	HEAP* priorityQueue;
+	VERTEX* u;
+	priorityQueue = Initialize(priorityQueue, n , s);
+	while (priorityQueue != NULL)
+	{
+		u = extractMin(priorityQueue, flag);
+		numInQueue--;
+
+	}
+}

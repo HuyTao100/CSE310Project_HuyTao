@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 {
 	graph(argc, argv);
 	FILE *ifile;
-	int n, m, u;
+	int n, m;
 
 	fscanf(ifile, "%d %d", &n, &m);
 	int command, arg1, arg2, arg3, source;
@@ -32,10 +32,12 @@ int main(int argc, char *argv[])
 				break;
 			}
 			source = arg1;
-			Q = Initialize(n, arg1);
+			Q = Dijikstra(n, arg1);
+			VERTEX* u;
 			while (Q != NULL)
 			{
 				u = extractMin(Q, arg3);
+				for (int i 0; )
 			}
 			isComputed = true;
 			break;

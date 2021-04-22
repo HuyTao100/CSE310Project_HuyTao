@@ -16,8 +16,9 @@ typedef struct TAG_VERTEX {
 }VERTEX;
 
 void graph(int argc, char* argv[]);
-HEAP* initializeSingleSource(int vertex);
+HEAP* initializeSingleSource(HEAP* Q, int vertex);
 int getWeight(int u, int v);
-HEAP* relax(int u, int v);
+HEAP* relax(HEAP* Q, int u, int v, float value, int flag);
+HEAP* DijkstraSP(int s, int value);
 
 #endif

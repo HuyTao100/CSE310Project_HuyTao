@@ -4,18 +4,17 @@
 #include "heap.h"
 #include "graph.h"
 
-HEAP* Initialize(int n, int s) {
-    HEAP* heap = (HEAP*)calloc(1, sizeof(HEAP)); // Dynamic memory allocation
+HEAP* Initialize(HEAP* heap, int n, int s) {
     if (heap != NULL)
     {
         heap->capacity = n;
         heap->size = 1;
-        heap->H = initializeSingleSource(s);
+        heap = initializeSingleSource(heap, s);
     }
     return heap;
 }
 
-int extractMin(HEAP* heap, int flag)
+VERTEX* extractMin(HEAP* heap, int flag)
 {
     VERTEX* minimum;
     if (heap == NULL || heap->size < 1)
@@ -31,7 +30,7 @@ int extractMin(HEAP* heap, int flag)
     }
     if (flag == 1)
         printf("Delete vertex %d, key=%12.4f\n", minimum->vertex_ID, minimum->distance);
-    return minimum->vertex_ID;
+    return minimum;
 }
 
 void decreaseKey(HEAP* heap, int id, float value, int flag)
