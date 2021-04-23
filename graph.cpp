@@ -8,14 +8,11 @@
 #include "heap.h"
 
 using namespace std;
+VERTEX** VertexArray;
 
-int vertices, edges;
-EDGE*** arrays;
-VERTEX** vertexArray;
-int numInQueue = 0;
-
- void graph(int argc, char* argv[])
+EDGE** graph(int argc, char* argv[])
 {
+	int vertices, edges;
 	const char* graph = argv[1];
 	const char* direction = argv[2];
 
@@ -27,14 +24,14 @@ int numInQueue = 0;
 		throw invalid_argument("cannot open file for reading or file does not exist\n");
 
 	fscanf(afile, "%d, %d", &vertices, &edges);
-	EDGE*** someArray = new EDGE * *[vertices]; 
-	VERTEX** someVertexArray = new VERTEX * [vertices];
-	arrays = someArray;
-
+	EDGE** someArray = new EDGE * [vertices];
+	EDGE* nullEdge = new EDGE;
+	nullEdge->next = NULL;
+	nullEdge->vertex_u = -1;
+	nullEdge->weight = -1;
 	for (int i = 0; i < vertices; i++)
 	{
-		EDGE **array = new EDGE*[vertices];
-		arrays[i] = array;
+		someArray[i] = nullEdge;
 	}
 
 	int edgeID, vertexU, vertexV;
@@ -42,121 +39,105 @@ int numInQueue = 0;
 
 	for (int i = 0; i < edges; i++)
 	{
-		int flag = 0;
-		int flag2 = 0;
 		fscanf(afile, "%d %d %d %f", &edgeID, &vertexU, &vertexV, &weight);
 		EDGE* edge = (EDGE*)malloc(sizeof(EDGE));
 		edge->edge_ID = edgeID;
 		edge->vertex_u = vertexU;
-		edge->vertex_v = vertexV;
+		edge->next = NULL;
 		edge->weight = weight;
 		if (strcmp(direction, "directed"))
 		{
-			EDGE**arrayToInsert = arrays[vertexU];
-			for (int j = 0; j < vertices; j++)
+			if (someArray[vertexU]->vertex_u == -1)
 			{
-				if (arrayToInsert[j] == NULL && flag == 0)
-				{
-					arrayToInsert[j] = edge;
-					flag = 1;
-				}
-				flag = 0;
+				someArray[vertexU] = edge;
 			}
-			arrays[vertexU] = arrayToInsert;
+			edge->next = someArray[vertexV];
 		}
-		if (strcmp(direction, "undirected"))
+		else if (strcmp(direction, "undirected"))
 		{
-			EDGE** arrayToInsert = arrays[vertexU];
-			EDGE** arrayToInsert2 = arrays[vertexV];
-			for (int j = 0; j < vertices; j++)
+			if (someArray[vertexU]->vertex_u == -1)
 			{
-				if (arrayToInsert[j] == NULL && flag == 0)
-				{
-					arrayToInsert[j] = edge;
-					flag = 1;
-				}
-
-				if (arrayToInsert2[j] == NULL && flag2 == 0)
-				{
-					edge->vertex_v = vertexU;
-					edge->vertex_u = vertexV;
-					arrayToInsert2[j] = edge;
-					flag2 = 1;
-				}
-				arrays[vertexU] = arrayToInsert;
-				arrays[vertexV] = arrayToInsert2;
-				flag = 0;
-				flag2 = 0;
+				someArray[vertexU] = edge;
 			}
+			edge->next = someArray[vertexV];
+			someArray[vertexV]->next = someArray[edge->vertex_u];
 		}
-		
 	}
-
+	return someArray;
 }
 
-HEAP* initializeSingleSource(HEAP* Q, int vertex)
+void createVertexArray(EDGE** Graph, int vertices)
+{
+	VERTEX** vertexArray = new VERTEX*[vertices];
+	VERTEX* nullVertex = new VERTEX;
+	nullVertex->pos = -1;
+	for (int i = 0; i < vertices; i++)
+	{
+		vertexArray[i] = nullVertex;
+	}
+
+	VertexArray = vertexArray;
+	delete vertexArray;
+}
+
+HEAP* initializeSingleSource(int vertices, int vertex)
  {
 	 for (int i = 0; i < vertices; i++)
 	 {
-		 VERTEX* someVertex = new VERTEX();
-		 someVertex->vertex_ID = i;
-		 someVertex->distance = INFINITY;
-		 someVertex->previous = NULL;
-		 vertexArray[i] = someVertex;
-		 vertexArray[vertex]->distance = 0;
+		 VertexArray[i]->distance = INFINITY;
+		 VertexArray[i]->pi = NULL;
 	 }
-	 VERTEX** S = new VERTEX * [vertices];
-	 Q->H = S;
-	 Q->H[numInQueue] = vertexArray[vertex];
-	 numInQueue = numInQueue + 1;
-
-	 return Q;
+	 VertexArray[vertex]->distance = 0;
+	 VertexArray[vertex]->pos = 0;
+	 HEAP* newHeap = Initialize(vertices);
+	 newHeap->H[0]->vertex = vertex;
+	 newHeap->H[0]->key = 0;
+	 return newHeap;
  }
 
- int getWeight(int u, int v)
+HEAP* relax(HEAP* Queue, int u, int v, int weight, int flag)
  {
-	 for (int i = 0; i < vertices; i++)
+	 if (VertexArray[u]->distance == INFINITY)
 	 {
-		 EDGE** searchVertex = arrays[i];
-		 for (int j = 0; j < vertices; j++)
+		 VertexArray[v]->distance = VertexArray[u]->distance + weight;
+		 VertexArray[v]->pi = u;
+		 Queue->size++;
+		 VertexArray[v]->pos = Queue->size;
+		 Queue->H[Queue->size]->key = VertexArray[v]->distance;
+		 Queue->H[Queue->size]->vertex = VertexArray[v]->pos;
+		 if (flag == 1)
 		 {
-			 if (searchVertex[j] == NULL)
-			 {
-				 break;
-			 }
-			 if (searchVertex[j]->vertex_u == u && searchVertex[j]->vertex_v == v)
-			 {
-				 return searchVertex[j]->weight;
-			 }
-
+			 printf("Insert vertex %d, from %12.4f to %12.4f\n", v);
 		 }
 	 }
+
+
+	 else if (VertexArray[v]->distance > VertexArray[u]->distance + weight)
+	 {
+		 VertexArray[v]->distance = VertexArray[u]->distance + weight;
+		 VertexArray[u]->pi = u;
+		 int pos = VertexArray[v]->pos;
+		 Queue = decreaseKey(Queue, pos, VertexArray[v]->distance, flag);
+	 }
+
+	 return Queue;
  }
 
-HEAP* relax(HEAP* Q, int u, int v, float value, int flag)
- {
-	 if (vertexArray[v]->distance == INFINITY)
-	 {
-		 vertexArray[v]->distance = vertexArray[u]->distance + getWeight(u, v);
-		 vertexArray[v]->previous = vertexArray[u];
-		 Q->H[numInQueue] = vertexArray[v];
-		 numInQueue = numInQueue + 1;
-		 return Q;
-	 }
-	 else if (vertexArray[v]->distance > vertexArray[u]->distance + getWeight(u, v))
-	 {
-		 vertexArray[v]->distance = vertexArray[u]->distance + getWeight(u, v);
-		 vertexArray[v]->previous = vertexArray[u];
-		 decreaseKey(Q, v, value, flag);
-		 return Q;
-	 }
- }
-
-HEAP* DijkstraSP(int n, int s, float value, int flag)
+HEAP* MovingUp(HEAP* heap, int pos)
 {
-	HEAP* priorityQueue;
-	VERTEX* u;
-	priorityQueue = Initialize(priorityQueue, n , s);
+	int parent; ElementT temp;
+
+	parent = pos / 2;
+	temp = heap->H[pos];
+	heap->H[pos] = heap->H[parent];
+	VertexArray[heap->H[pos]->vertex]->pos = pos;
+	VertexArray[heap->H[parent]->vertex]->pos = parent;
+}
+
+void DijkstraSP(EDGE**Graph, int source, int destination, int vertices, float value, int weight, int flag)
+{
+	createVertexArray(Graph, vertices);
+	HEAP* priorityQueue = initializeSingleSource(vertices, source);
 	while (priorityQueue != NULL)
 	{
 		u = extractMin(priorityQueue, flag);

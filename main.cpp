@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 				break;
 			}
 			source = arg1;
-			Q = DijkstraSP(n, source, arg2, arg3);
+			DijkstraSP(n, source, arg2, arg3);
 			isComputed = true;
 			break;
 		}

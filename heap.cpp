@@ -4,18 +4,21 @@
 #include "heap.h"
 #include "graph.h"
 
-HEAP* Initialize(HEAP* heap, int n, int s) 
+HEAP* Initialize(int n) 
 {
-    if (heap != NULL)
+    HEAP* myHeap = (HEAP*)malloc(sizeof(HEAP)); //dynamic memory allocation
+    if (myHeap != NULL)
     {
-        heap = initializeSingleSource(heap, s);
+        myHeap->capacity = n;
+        myHeap->size = 0;
+        myHeap->H = (ElementT*)malloc((n + 1) * sizeof(ElementT)); //dynamic memory allocation
     }
-    return heap;
+    return myHeap;
 }
 
-VERTEX* extractMin(HEAP* heap, int flag)
+int extractMin(HEAP* heap, int flag)
 {
-    VERTEX* minimum;
+    ElementT minimum;
     if (heap == NULL || heap->size < 1)
     {
         printf("Error: heap is NULL or empty\n");
@@ -28,11 +31,11 @@ VERTEX* extractMin(HEAP* heap, int flag)
         minHeapify(heap, 1);
     }
     if (flag == 1)
-        printf("Delete vertex %d, key=%12.4f\n", minimum->vertex_ID, minimum->distance);
-    return minimum;
+        printf("Delete vertex %d, key=%12.4f\n", minimum->vertex, minimum->key);
+    return minimum->vertex;
 }
 
-void decreaseKey(HEAP* heap, int id, float value, int flag)
+HEAP* decreaseKey(HEAP* heap, int pos, int newKey, int flag)
 {
     if (heap == NULL)
     {
@@ -40,25 +43,28 @@ void decreaseKey(HEAP* heap, int id, float value, int flag)
     }
     else
     {
-        int indexOfHeap = getVertexIndex(heap, id);
-        if (indexOfHeap < 1 || indexOfHeap > heap->size || value >= heap->H[indexOfHeap]->distance)
+        if (pos < 1 || pos > heap->size || newKey >= heap->H[pos]->key)
         {
             printf("Error: invalid call to DecreaseKey\n");
         }
         else
         {
+            heap->H[pos]->key = newKey;
+            int parent = pos / 2;
+            if (pos > 1 && heap->H[pos]->key < heap->H[parent]->key)
+            {
+                heap = MovingUp(heap, pos);
+            }
+            while(parent > 1 && heap->H[pos]->key < heap->H[parent]->key)
+            {
+                parent = parent / 2;
+                heap = MovingUp(heap, parent);
+            }
             if (flag == 1)
-                printf("Decrease key of vertex %d, from %12.4f to %12.4f\n", id, heap->H[indexOfHeap]->distance, value);
-        }
-        heap->H[indexOfHeap]->distance = value;
-        while (indexOfHeap > 1 && heap->H[indexOfHeap / 2]->distance < heap->H[indexOfHeap]->distance)
-        {
-            int temp = heap->H[indexOfHeap]->distance;
-            heap->H[indexOfHeap]->distance = heap->H[indexOfHeap / 2]->distance;
-            heap->H[indexOfHeap / 2]->distance = temp;
-            indexOfHeap = indexOfHeap / 2;
+                printf("Decrease key of vertex %d, from %12.4f to %12.4f\n", pos, heap->H[pos]->key, newKey);
         }
     }
+    return heap;
 
 }
 
@@ -82,7 +88,7 @@ int minHeapify(HEAP* heap, int i) {
     l = i * 2;
     r = (i * 2) + 1;
     int calls = 1;
-    if (l <= heap->size && heap->H[l]->distance < heap->H[i]->distance)
+    if (l <= heap->size && heap->H[l]->key < heap->H[i]->key)
     {
         smallest = l;
     }
@@ -90,15 +96,15 @@ int minHeapify(HEAP* heap, int i) {
     {
         smallest = i;
     }
-    if (r <= heap->size && heap->H[r]->distance < heap->H[smallest]->distance)
+    if (r <= heap->size && heap->H[r]->key < heap->H[smallest]->key)
     {
         smallest = r;
     }
     if (smallest != i)
     {
-        int temp = heap->H[i]->distance;
-        heap->H[i]->distance = heap->H[smallest]->distance;
-        heap->H[smallest]->distance = temp;
+        int temp = heap->H[i]->key;
+        heap->H[i]->key = heap->H[smallest]->key;
+        heap->H[smallest]->key = temp;
         calls += minHeapify(heap, smallest);
     }
     return calls;
