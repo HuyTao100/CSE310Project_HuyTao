@@ -1,10 +1,10 @@
-#ifndef graph_H_
-#define graph_H_
-#include "heap.h"
+#ifndef graph_H
+#define graph_H
 
 typedef struct TAG_EDGE {
 	int edge_ID;
 	int vertex_u;
+	int vertex_v;
 	int weight;
 	TAG_EDGE *next;
 }EDGE;
@@ -12,19 +12,17 @@ typedef struct TAG_EDGE {
 typedef EDGE* pEDGE;
 
 typedef struct TAG_VERTEX {
+	int vertex;
 	int pos;
 	int pi;
-	float distance;
+	float key;
 }VERTEX;
+typedef VERTEX *pVERTEX;
 
-EDGE** graph(int argc, char* argv[]);
-VERTEX** createVertexArray(EDGE** G, int n);
-HEAP* initializeSingleSource(HEAP* Q, int vertex);
-int getWeight(int u, int v);
-HEAP* relax(HEAP* Q, int u, int v, float value, int flag);
-HEAP* DijkstraSP(int n, int s, float value, int flag);
-VERTEX* findVertex(int i);
-VERTEX* getVertex(int i);
-HEAP* MovingUp(HEAP* heap, int pos);
+void graph(FILE* afile, int vertices, int edges, char direction[]);
+void createVertexArray(EDGE** Graph, int vertices);
+HEAP* relax(HEAP* Queue, int u, int v, float weight, int flag);
+HEAP* DijkstraSP(EDGE** Graph, int source, int destination, int vertices, int flag);
+void MovingUp(HEAP* heap, int pos);
 
 #endif

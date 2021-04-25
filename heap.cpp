@@ -16,7 +16,7 @@ HEAP* Initialize(int n)
     return myHeap;
 }
 
-int extractMin(HEAP* heap, int flag)
+ extractMin(HEAP* heap, int flag)
 {
     ElementT minimum;
     if (heap == NULL || heap->size < 1)
@@ -30,12 +30,10 @@ int extractMin(HEAP* heap, int flag)
         heap->size--;
         minHeapify(heap, 1);
     }
-    if (flag == 1)
-        printf("Delete vertex %d, key=%12.4f\n", minimum->vertex, minimum->key);
     return minimum->vertex;
 }
 
-HEAP* decreaseKey(HEAP* heap, int pos, int newKey, int flag)
+int decreaseKey(HEAP* heap, int pos, float newKey, int flag)
 {
     if (heap == NULL)
     {
@@ -43,44 +41,33 @@ HEAP* decreaseKey(HEAP* heap, int pos, int newKey, int flag)
     }
     else
     {
+        if (flag == 1)
+				printf("Decrease key of vertex %d, from %12.4f to %12.4f\n", pos, heap->H[pos]->key, newKey);
         if (pos < 1 || pos > heap->size || newKey >= heap->H[pos]->key)
         {
             printf("Error: invalid call to DecreaseKey\n");
+            return 1;
         }
-        else
-        {
             heap->H[pos]->key = newKey;
-            int parent = pos / 2;
-            if (pos > 1 && heap->H[pos]->key < heap->H[parent]->key)
-            {
-                heap = MovingUp(heap, pos);
-            }
-            while(parent > 1 && heap->H[pos]->key < heap->H[parent]->key)
-            {
-                parent = parent / 2;
-                heap = MovingUp(heap, parent);
-            }
-            if (flag == 1)
-                printf("Decrease key of vertex %d, from %12.4f to %12.4f\n", pos, heap->H[pos]->key, newKey);
-        }
+            MovingUp(heap, pos);
+            return 0;
     }
-    return heap;
 
 }
-
-int getVertexIndex(HEAP* heap, int id)
+void insert(HEAP *heap, ELEMENT *element)
 {
-    if (heap != NULL)
+    if (heap == NULL || heap->size == heap->capacity)
     {
-        for (int i = 1; i < heap->size + 1; i++)
-        {
-            if (heap->H[i]->vertex_ID == id)
-            {
-                return i;
-            }
-        }
+        printf("Error: heap is NULL or full\n");
     }
-    return 0;
+    heap->size++;
+    int i = heap->size;
+    while (i > 1 && heap->H[i/2]->key > element->key)
+    {
+        heap->H[i] = heap->H[i/2];
+        i = i/2;
+    }
+    heap->H[i] = element;
 }
 
 int minHeapify(HEAP* heap, int i) {
