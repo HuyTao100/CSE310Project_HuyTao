@@ -6,20 +6,16 @@
 #include "heap.h"
 #include "graph.h"
 using namespace std;
-VERTEX* V;
+pVERTEX *V;
 
 int main(int argc, char *argv[])
 {
-	char word[256];
-	char word2[256];
 	int n, m, directed_graph;
 	int edge_id, u, v, source, destination, flag;
 	float w;
 	int v_fscanf;
 	pEDGE *A;
 	pEDGE node;
-	pVERTEX *V;
-	char* direction = argv[2];
 	FILE *ifile;
 	ifile = fopen(argv[1], "r");
 	if (!ifile)
@@ -58,8 +54,9 @@ int main(int argc, char *argv[])
 	source = 0;
 	destination = 0;
 	V = (pVERTEX *) calloc(n+1, sizeof(pVERTEX));
-	for (int i = 1; i<=n; i++){
-		V[i] = (VERTEX *) malloc(sizeof(VERTEX));
+	for(int i = 1; i <= n; i++)
+	{
+		V[i] = (VERTEX*) malloc (sizeof(VERTEX));
 		V[i]->vertex = i;
 	}
 	int command, arg1, arg2, arg3;
@@ -105,12 +102,11 @@ int main(int argc, char *argv[])
 		{
 			cout << "Query: stop\n";
 			//free all dynamically allocated memory
-			delete Graph;
-			delete Q;
+			free(A);
 			exit(0);
 		}
 		default:
-			break;*/
+			break;
 		}
 	}
 }

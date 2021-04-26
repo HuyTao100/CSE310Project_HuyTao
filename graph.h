@@ -2,7 +2,6 @@
 #define graph_H
 
 typedef struct TAG_EDGE {
-	int edge_ID;
 	int vertex_u;
 	int vertex_v;
 	int weight;
@@ -12,6 +11,7 @@ typedef struct TAG_EDGE {
 typedef EDGE* pEDGE;
 
 typedef struct TAG_VERTEX {
+	int color;
 	int vertex;
 	int pos;
 	int pi;
@@ -19,10 +19,12 @@ typedef struct TAG_VERTEX {
 }VERTEX;
 typedef VERTEX *pVERTEX;
 
-void graph(FILE* afile, int vertices, int edges, char direction[]);
-void createVertexArray(EDGE** Graph, int vertices);
-HEAP* relax(HEAP* Queue, int u, int v, float weight, int flag);
-HEAP* DijkstraSP(EDGE** Graph, int source, int destination, int vertices, int flag);
-void MovingUp(HEAP* heap, int pos);
+typedef struct TAG_PATH{
+	int vertex;
+	TAG_PATH *next;
+}PATH;
+typedef PATH *pPATH;
 
+void dijkstra(int n, pEDGE *A, int s, int t, int flag);
+void printPath(int n, int source, int destination, int s, int t);
 #endif

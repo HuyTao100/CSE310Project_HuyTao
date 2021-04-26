@@ -4,6 +4,8 @@
 #include "heap.h"
 #include "graph.h"
 
+extern pVERTEX *V;
+
 HEAP* Initialize(int n) 
 {
     HEAP* myHeap = (HEAP*)malloc(sizeof(HEAP)); //dynamic memory allocation
@@ -11,26 +13,32 @@ HEAP* Initialize(int n)
     {
         myHeap->capacity = n;
         myHeap->size = 0;
-        myHeap->H = (ElementT*)malloc((n + 1) * sizeof(ElementT)); //dynamic memory allocation
+        myHeap->H = (pELEMENT*)calloc(n + 1, sizeof(pELEMENT)); //dynamic memory allocation
     }
     return myHeap;
 }
 
- extractMin(HEAP* heap, int flag)
+void heapFree(HEAP *heap)
 {
-    ElementT minimum;
+    free(heap->H);
+    free(heap);
+}
+
+pELEMENT extractMin(HEAP* heap)
+{
+    pELEMENT minimum, last;
     if (heap == NULL || heap->size < 1)
     {
         printf("Error: heap is NULL or empty\n");
+        return NULL;
     }
-    else
-    {
         minimum = heap->H[1];
-        heap->H[1] = heap->H[heap->size];
-        heap->size--;
+        last = heap->H[heap->size--];
+        heap->H[1] = last;
+        V[heap->H[1]->vertex]->pos = 1;    
         minHeapify(heap, 1);
-    }
-    return minimum->vertex;
+        V[minimum->vertex]->pos = 0;
+        return minimum;
 }
 
 int decreaseKey(HEAP* heap, int pos, float newKey, int flag)
@@ -41,33 +49,36 @@ int decreaseKey(HEAP* heap, int pos, float newKey, int flag)
     }
     else
     {
-        if (flag == 1)
-				printf("Decrease key of vertex %d, from %12.4f to %12.4f\n", pos, heap->H[pos]->key, newKey);
         if (pos < 1 || pos > heap->size || newKey >= heap->H[pos]->key)
         {
             printf("Error: invalid call to DecreaseKey\n");
             return 1;
         }
+        if (flag == 1)
+        {
+				printf("Decrease key of vertex %d, from %12.4f to %12.4f\n", pos, heap->H[pos]->key, newKey);
+        }
             heap->H[pos]->key = newKey;
             MovingUp(heap, pos);
             return 0;
+        
     }
-
+    return 1;
 }
-void insert(HEAP *heap, ELEMENT *element)
+int heapInsert(HEAP *heap, pELEMENT element)
 {
-    if (heap == NULL || heap->size == heap->capacity)
+    if (heap->size >= heap->capacity)
     {
-        printf("Error: heap is NULL or full\n");
+        printf("Error in heapInsert: Heap full...\n");
+        return 1;
     }
     heap->size++;
-    int i = heap->size;
-    while (i > 1 && heap->H[i/2]->key > element->key)
-    {
-        heap->H[i] = heap->H[i/2];
-        i = i/2;
-    }
-    heap->H[i] = element;
+    heap->H[heap->size] = element;
+    V[heap->H[heap->size]->vertex]->pos = heap->size;
+
+    MovingUp(heap, heap->size);
+
+    return 0;
 }
 
 int minHeapify(HEAP* heap, int i) {
@@ -97,14 +108,20 @@ int minHeapify(HEAP* heap, int i) {
     return calls;
 }
 
-int buildMinHeap(HEAP* heap)
+void MovingUp(HEAP *heap, int pos)
 {
-    int calls = 0;
-    int length = (heap->size) / 2;
-    for (int i = length; i >= 1; i--)
+    pELEMENT temp;
+    int parent;
+
+    parent = pos/2;
+    if (pos > 1 && heap->H[pos]->key < heap->H[parent]->key)
     {
-        calls += minHeapify(heap, i);
+        temp = heap->H[pos];
+        heap->H[pos] = heap->H[parent];
+        heap->H[parent] = temp;
+        V[heap->H[pos]->vertex]->pos = pos;
+        V[heap->H[parent]->vertex]->pos = parent;
+        MovingUp(heap, parent);
     }
-    return calls;
 }
 
