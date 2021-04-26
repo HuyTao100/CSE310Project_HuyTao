@@ -12,8 +12,6 @@ extern pVERTEX *V;
 
 void printPath(int n, int source, int destination, int s, int t)
 {
-	PATH *pPATH;
-	PATH *pNode;
 	int u, v;
 
 	if (V[t]->color == 0){
@@ -25,30 +23,16 @@ void printPath(int n, int source, int destination, int s, int t)
 			return;
 		}
 	} else if (V[t]->color == 1){
-		printf("Path not known to be shortest: <%d", s);
+		printf("Path not known to be shortest: <%d, ", s);
 	} else if (V[t]->color == 2){
-		printf("Shortest path: <%d", s);
+		printf("Shortest path: <%d, ", s);
 	}
-
-	pNode = (PATH *) malloc(sizeof(PATH));
-	pNode->vertex = t;
-	pNode->next = NULL;
-	pPATH = pNode;
-	v = pNode->vertex;
-	while (V[v]->pi){
-		u = V[v]->pi;
-		pNode = (PATH *) malloc(sizeof(PATH));
-		v = u;
-		pNode->vertex = u;
-		pPATH = pNode;
+	v = V[t]->pi;
+	while (v != 0 && v != s) {
+		printf("%d, ", v);
+		v = V[v]->pi;
 	}
-	while (pPATH){
-		pNode = pPATH;
-		printf(", %d", pNode->vertex);
-		pPATH = pPATH->next;
-		free(pNode);
-	}
-	printf(">\n");
+	printf("%d>\n", t);
 	printf("The path weight is: %12.4f\n", V[t]->key);
 }
 

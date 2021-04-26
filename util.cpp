@@ -22,7 +22,7 @@ int nextCommand(int* n, int* f, int *o)
             scanf("%s", c);
             if (strcmp(c, "path") == 0)
             {
-                scanf("%d %d %d", n, f, o);
+                scanf("%d %d", n, f);
                 command = 2;
                 break;
             }

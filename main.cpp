@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
 			else{
 				printPath(n, source, destination, arg1, arg2);
 			}
-
+			break;
 		}
 		case 3: //stop
 		{
